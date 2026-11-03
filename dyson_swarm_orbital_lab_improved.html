@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050914">
+<title>ORBITAL LAB — Dyson Swarm Explorer</title>
+<style>
+:root{color-scheme:dark;--bg:#050914;--panel:#0b1728;--panel2:#101f33;--line:rgba(157,194,226,.17);--text:#edf6ff;--muted:#9bb0c6;--cyan:#68e2ef;--gold:#ffc875;--green:#8ce4b8;--max:1440px}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:18px}body{margin:0;background:radial-gradient(ellipse at 50% -10%,#172b45 0,#081323 42%,#040811 100%);color:var(--text);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input{font:inherit}button{cursor:pointer;color:inherit}a{color:inherit}
+.logo{font-weight:900;font-size:12px;letter-spacing:.22em}.logo i{color:var(--cyan);font-style:normal}
+.wrap{max-width:var(--max);margin:auto;padding:0 clamp(15px,4vw,58px)}.hero{padding:clamp(42px,7vw,90px) 0 35px}.eyebrow{font-size:10px;letter-spacing:.22em;font-weight:850;color:var(--cyan);text-transform:uppercase}.hero h1{font-size:clamp(44px,8.5vw,112px);line-height:.88;letter-spacing:-.075em;margin:18px 0 23px;max-width:950px}.hero h1 span{color:var(--gold)}.hero p{max-width:730px;color:#afc0d2;font-size:clamp(14px,1.5vw,18px);line-height:1.8;margin:0}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:23px}.chip{border:1px solid var(--line);border-radius:99px;padding:6px 11px;color:#b5c9dc;font-size:10px;letter-spacing:.08em}
+.sectionHead{display:flex;align-items:end;justify-content:space-between;gap:25px;margin:64px 0 18px}.sectionHead h2{font-size:clamp(27px,4vw,46px);line-height:1.05;letter-spacing:-.05em;margin:8px 0 0}.sectionHead p{max-width:490px;color:var(--muted);font-size:13px;margin:0;line-height:1.7}
+.simGrid{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(290px,.75fr);gap:14px}.stage{height:clamp(440px,57vw,720px);min-height:440px;position:relative;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:radial-gradient(ellipse at 50% 50%,#11263b 0,#081323 47%,#050a14 100%);box-shadow:0 25px 90px #0008;touch-action:none;cursor:grab}.stage.dragging{cursor:grabbing}.stage canvas{width:100%;height:100%;display:block;touch-action:none}.stageTop{position:absolute;z-index:2;left:18px;right:18px;top:16px;display:flex;justify-content:space-between;pointer-events:none}.stageTop strong{font-size:12px;letter-spacing:.1em}.stageTop small{display:block;color:#91a9c0;font-size:9px;letter-spacing:.14em;margin-top:3px}.live{font-size:10px;color:var(--green);letter-spacing:.12em}.live:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:7px;box-shadow:0 0 10px var(--green)}.stageBottom{position:absolute;bottom:13px;left:15px;right:15px;display:flex;align-items:center;justify-content:flex-start;gap:10px;pointer-events:none}.hint{font-size:10px;color:#91a9c0}.controls{display:flex;gap:6px;pointer-events:auto}.btn{border:1px solid rgba(168,207,239,.25);background:rgba(5,13,25,.84);padding:8px 11px;border-radius:9px;font-size:11px}.btn:hover,.btn.on{border-color:var(--cyan);color:var(--cyan)}.side{display:flex;flex-direction:column;gap:12px}.panel{border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,rgba(15,30,49,.96),rgba(7,15,28,.97));padding:17px}.panel h3{font-size:12px;letter-spacing:.13em;text-transform:uppercase;margin:0 0 5px}.muted{color:var(--muted);font-size:12px;line-height:1.65}.rangeLine{display:flex;justify-content:space-between;gap:12px;font-size:11px;color:#c2d2e1;margin:14px 0 5px}.rangeLine b{color:var(--cyan);font-variant-numeric:tabular-nums}input[type=range]{width:100%;accent-color:var(--cyan)}.switchrow{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding:9px 0;font-size:11px;color:#c4d3e1}.switch{appearance:none;width:34px;height:19px;background:#304257;border-radius:20px;position:relative;cursor:pointer}.switch:checked{background:#167f91}.switch:before{content:"";position:absolute;width:13px;height:13px;left:3px;top:3px;background:white;border-radius:50%;transition:.18s}.switch:checked:before{left:18px}.primary{width:100%;border:0;border-radius:9px;padding:11px;background:linear-gradient(100deg,#a6eff0,#5bc4d8);color:#04121a;font-size:11px;font-weight:900;letter-spacing:.07em;margin-top:9px}.primary:hover{filter:brightness(1.1)}.readout{font-size:26px;letter-spacing:-.05em;margin:8px 0 0}.readout small{font-size:10px;color:var(--muted);letter-spacing:0}.miniStats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.miniStats div{background:#07111f;border:1px solid var(--line);border-radius:9px;padding:9px}.miniStats b{display:block;font-size:15px}.miniStats span{font-size:8px;color:var(--muted);letter-spacing:.1em}
+.callout{border-left:2px solid var(--gold);padding:8px 0 8px 13px;color:#aebfd0;font-size:11px;line-height:1.7;margin-top:10px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.card{border:1px solid var(--line);border-radius:14px;padding:19px;background:linear-gradient(145deg,#102039,#091321)}.card .num{font-size:9px;color:var(--cyan);letter-spacing:.18em}.card h3{font-size:16px;margin:10px 0 7px}.card p{font-size:12px;color:#a9bbce;line-height:1.75;margin:0}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}.bigPanel{border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,#102039,#091321);padding:clamp(17px,3vw,27px)}.bigPanel h3{font-size:21px;letter-spacing:-.03em;margin:7px 0 10px}.bigPanel p{font-size:13px;color:#a9bbce;line-height:1.8}.equation{padding:13px 15px;border-radius:10px;background:#050d19;border:1px solid var(--line);font:clamp(14px,2vw,20px) Georgia,serif;color:#d9f5fa;margin:13px 0;text-align:center}.tag{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:4px 8px;color:#a9c0d5;font-size:9px;letter-spacing:.1em}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;align-items:stretch}.flowStep{border:1px solid var(--line);border-radius:12px;padding:15px;background:#0b192a;position:relative}.flowStep:not(:last-child):after{content:"→";position:absolute;right:-12px;top:42%;z-index:2;color:var(--gold);font-size:16px}.flowStep b{font-size:10px;color:var(--cyan);letter-spacing:.1em}.flowStep h4{margin:9px 0 5px;font-size:13px}.flowStep p{font-size:10px;color:#a6b8cb;line-height:1.65;margin:0}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0}.tab{background:#0a1727;border:1px solid var(--line);color:#aebfd0;border-radius:99px;padding:8px 12px;font-size:11px}.tab.active{color:var(--cyan);border-color:var(--cyan);background:#0d2735}.inspect{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center}.collectorArt{height:290px;border:1px solid var(--line);border-radius:13px;background:radial-gradient(ellipse at 50% 55%,#1c3c51,#091522 70%);position:relative;overflow:hidden;display:grid;place-items:center}.collectorArt svg{width:min(90%,440px);height:90%}.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px}.fact{border:1px solid var(--line);border-radius:9px;padding:10px;background:#071321}.fact span{display:block;font-size:9px;color:var(--muted);letter-spacing:.09em}.fact b{font-size:13px}
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.time{padding:17px;border-top:2px solid #438b9a;border-radius:0 0 10px 10px;background:#0c1929}.time b{font-size:10px;color:var(--gold);letter-spacing:.12em}.time h3{font-size:14px;margin:8px 0}.time p{font-size:11px;color:#a7bacd;line-height:1.65;margin:0}
+footer{margin:65px 0 0;border-top:1px solid var(--line);padding:22px 0 35px;display:flex;justify-content:space-between;gap:20px;color:#7f96ac;font-size:10px;line-height:1.7}footer strong{letter-spacing:.2em;color:#bed3e4}
+.modal{position:fixed;inset:0;z-index:40;background:#02060ddc;backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:16px}.modal.open{display:flex}.modalBox{width:min(920px,100%);max-height:92dvh;overflow:auto;background:#0a1728;border:1px solid rgba(132,196,225,.3);border-radius:18px;box-shadow:0 25px 100px #000b}.modalHead{display:flex;justify-content:space-between;align-items:center;padding:16px 19px;border-bottom:1px solid var(--line)}.modalHead h3{margin:0;font-size:13px;letter-spacing:.12em}.close{background:#14263a;border:1px solid var(--line);border-radius:8px;padding:6px 10px}.modalBody{padding:19px}.collectorGrid{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}.collectorGraphic{min-height:290px;background:radial-gradient(ellipse at center,#19374a,#07101c 70%);border-radius:12px;display:grid;place-items:center;border:1px solid var(--line)}.collectorGraphic svg{width:94%;max-height:320px}.modalStats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.modalStats div{padding:11px;background:#06101d;border:1px solid var(--line);border-radius:9px}.modalStats span{display:block;font-size:9px;color:var(--muted);letter-spacing:.1em}.modalStats b{font-size:16px}.layerList{display:grid;gap:7px;margin-top:13px}.layer{display:flex;gap:9px;align-items:flex-start;padding:9px;border:1px solid var(--line);border-radius:9px;font-size:11px;color:#b6c8d9}.swatch{width:10px;height:10px;flex:none;border-radius:2px;margin-top:4px}.notice{font-size:10px;color:#9db0c4;line-height:1.65;margin-top:12px}
+/* Mission-control presentation: the swarm owns the first screen. */
+@media(min-width:1001px){
+ html,body{height:100%;overflow-x:hidden}
+ .wrap{max-width:none;padding:0 clamp(12px,1.6vw,26px)}
+ #home{padding-top:0}
+ .hero{display:none}
+ #sim{height:calc(100dvh - 18px);min-height:560px;display:flex;flex-direction:column;padding:10px 0 12px}
+ #sim>.sectionHead{margin:0 0 9px;align-items:center;min-height:40px}
+ #sim>.sectionHead h2{font-size:22px;margin:3px 0 0}
+ #sim>.sectionHead p{font-size:10px;max-width:560px;line-height:1.4}
+ .simGrid{flex:1;min-height:0;grid-template-columns:minmax(0,1fr) minmax(275px,310px);gap:10px}
+ .stage{height:100%;min-height:0;border-radius:14px}
+ .side{min-height:0;overflow-y:auto;gap:9px;scrollbar-width:thin}
+ .panel{padding:13px;border-radius:12px}
+ .panel h3{font-size:11px}
+ .muted{font-size:10px;line-height:1.45}
+ .rangeLine{margin:9px 0 3px;font-size:10px}
+ .switchrow{padding:7px 0;font-size:10px}
+ .readout{font-size:22px}
+ .miniStats div{padding:7px}
+ .callout{font-size:10px;line-height:1.5}
+ #physics{scroll-margin-top:70px}
+}
+@media(max-width:1000px){
+ .hero{padding:24px 0 10px}
+ .hero h1{font-size:clamp(36px,7vw,65px);margin:10px 0}
+ .hero p{display:none}.chips{margin-top:10px}
+ #sim>.sectionHead{margin:18px 0 10px}
+}
+@media(max-width:650px){
+ #sim{padding-bottom:0}
+ .hero{display:block}
+ .hero h1{font-size:40px}
+ .chips .chip{font-size:8px}
+}
+@media(max-width:1000px){.simGrid{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.stage{height:62vw;min-height:440px}.flow{grid-template-columns:repeat(3,1fr)}.flowStep:after{display:none!important}}
+@media(max-width:650px){.hero{padding-top:24px}.sectionHead{display:block;margin-top:47px}.sectionHead p{margin-top:10px}.side{grid-template-columns:1fr}.stage{height:70dvh;min-height:430px;max-height:650px}.stageTop{left:12px;right:12px;top:12px}.stageTop small{font-size:8px}.hint{max-width:55%;font-size:9px}.btn{padding:7px 9px;font-size:10px}.cards{grid-template-columns:1fr}.split{grid-template-columns:1fr}.flow{grid-template-columns:1fr 1fr}.inspect{grid-template-columns:1fr}.collectorArt{height:230px}.timeline{grid-template-columns:1fr 1fr}.collectorGrid{grid-template-columns:1fr}.collectorGraphic{min-height:220px}footer{display:block}footer div+div{margin-top:10px}}
+@media(min-width:1500px){.wrap{padding-left:58px;padding-right:58px}}
+
+/* Earth receiver inspection. */
+.earthDiagram{border:1px solid var(--line);border-radius:13px;background:radial-gradient(ellipse at 50% 50%,#14314a,#06101d 75%);padding:10px;margin:12px 0}
+.earthDiagram svg{display:block;width:100%;height:auto;max-height:300px}
+.earthSteps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.earthSteps div{border:1px solid var(--line);background:#071321;border-radius:9px;padding:10px;font-size:11px;color:#b6c8d9}
+.earthSteps b{display:block;color:var(--cyan);font-size:9px;letter-spacing:.1em;margin-bottom:4px}
+@media(max-width:650px){.earthSteps{grid-template-columns:1fr 1fr}}
+
+</style>
+</head>
+<body>
+
+<main class="wrap" id="home">
+<section class="hero"><div class="eyebrow">CLASS XI PHYSICS · GRAVITATION · SPACE ENGINEERING</div><h1>TOUCH THE<br><span>DYSON SWARM.</span></h1><p>An interactive mission into a possible future for solar energy. Fly around a star-scale network, inspect an individual solar collector, calculate its orbit, and follow the energy journey from sunlight to an Earth-based receiver.</p><div class="chips"><span class="chip">INTERACTIVE 3D-STYLE ORBITAL MODEL</span><span class="chip">CBSE PHYSICS CONNECTIONS</span><span class="chip">CONCEPTUAL MODEL — NOT TO SCALE</span></div></section>
+
+<section id="sim"><div class="sectionHead"><div><div class="eyebrow">01 / MISSION CONTROL</div><h2>Explore the swarm.</h2></div><p>Drag to rotate the camera. Use two fingers to zoom on touchscreens, or the scroll wheel on a computer. Tap or click a collector to open its engineering readout.</p></div>
+<div class="simGrid">
+<div class="stage" id="stage"><canvas id="space" aria-label="Interactive Dyson swarm orbital simulation"></canvas><div class="stageTop"><div><strong>STELLAR ORBITAL VIEW</strong><small>SUN-CENTRED REFERENCE FRAME · ILLUSTRATIVE</small></div><span class="live">SIMULATION LIVE</span></div><div class="stageBottom"><span class="hint">DRAG TO ORBIT VIEW · PINCH / SCROLL TO ZOOM · SELECT A SATELLITE</span></div></div>
+<aside class="side">
+<div class="panel"><h3>Swarm configuration</h3><div class="muted">Change the conceptual layout. These controls do not represent a flight-ready design.</div>
+<div class="rangeLine"><span>Collector count</span><b id="countVal">180</b></div><input id="count" type="range" min="40" max="600" step="20" value="180">
+<div class="rangeLine"><span>Orbital distance</span><b id="distVal">1.35 AU</b></div><input id="distance" type="range" min="50" max="200" value="135">
+<div class="rangeLine"><span>Collector area</span><b id="areaVal">1,000 m²</b></div><input id="area" type="range" min="100" max="10000" step="100" value="1000">
+<div class="rangeLine"><span>Simulation speed</span><b id="speedVal">1.0×</b></div><input id="simSpeed" type="range" min="0" max="40" step="1" value="10" aria-label="Simulation speed">
+<div class="switchrow"><span>Show orbit paths</span><input class="switch" id="showOrbits" type="checkbox" checked></div><div class="switchrow"><span>Show power links</span><input class="switch" id="showBeams" type="checkbox" checked></div><div class="switchrow"><span>Collector labels</span><input class="switch" id="showLabels" type="checkbox"></div><div class="callout" style="margin-top:9px"><b>Energy beam key</b><br><span style="color:#72e5f0">● Cyan</span> clear route to Earth · <span style="color:#ff7777">● Red</span> blocked by a planet. Planet paths use small inclinations and elliptical eccentricities. The beam test uses enlarged clearance envelopes for visibility, so it is illustrative rather than a precision ephemeris.</div>
+<button type="button" class="primary" id="newLayout">GENERATE ANOTHER SWARM LAYOUT ↗</button></div>
+<div class="panel"><h3>Selected system · estimated output</h3><div class="muted">Select a collector in the simulation to inspect its local conditions.</div><div class="readout" id="swarmPower">— <small>estimated total electrical power</small></div><div class="miniStats"><div><b id="nSat">180</b><span>COLLECTORS</span></div><div><b id="nDist">1.35</b><span>ORBITAL AU</span></div><div><b id="nArea">1,000</b><span>m² / UNIT</span></div></div><div class="callout">Power estimates use the inverse-square sunlight model and an assumed panel efficiency. They are educational estimates, not a real mission forecast.</div></div>
+</aside></div></section>
+
+<section id="physics"><div class="sectionHead"><div><div class="eyebrow">02 / YOUR CLASS XI CONNECTION</div><h2>Gravity is the orbital engine.</h2></div><p>A Dyson Swarm is a natural way to demonstrate gravitation: each collector is continuously falling around the Sun. Gravity supplies the centripetal force that bends its path into an orbit.</p></div>
+<div class="split">
+<article class="bigPanel"><span class="tag">CBSE CLASS XI · GRAVITATION</span><h3>Why doesn't a collector fall into the Sun?</h3><p>It is falling towards the Sun, but it also has a sideways velocity. As it falls, the curved path of its fall matches the curvature of its orbit. In an ideal circular orbit, gravitational force provides exactly the centripetal force required.</p><div class="equation">GMm / r² = mv² / r</div><div class="equation">v = √(GM / r)</div><p><b>Meaning:</b> G is the gravitational constant, M is the Sun's mass, m is the collector's mass, r is its distance from the Sun, and v is its circular orbital speed. Notice that the collector's mass cancels out.</p></article>
+<article class="bigPanel"><span class="tag">ORBITAL PERIOD</span><h3>How long is one trip around the Sun?</h3><p>For a circular orbit, the collector travels one circumference at orbital speed. Combining that with the gravity equation gives the orbital period.</p><div class="equation">T = 2π √(r³ / GM)</div><p>Move the orbital-distance slider in Mission Control and watch the calculated speed and period change. A larger orbital radius means a lower orbital speed but a longer orbital period.</p><div class="facts" style="margin-top:16px"><div class="fact"><span>SELECTED ORBIT SPEED</span><b id="orbSpeed">29.78 km/s</b></div><div class="fact"><span>ORBITAL PERIOD</span><b id="orbPeriod">365.3 days</b></div><div class="fact"><span>GRAVITATIONAL FIELD</span><b id="gravField">0.00593 m/s²</b></div><div class="fact"><span>ORBIT RADIUS</span><b id="orbRadius">1.00 AU</b></div></div></article></div>
+<div class="cards" style="margin-top:12px"><article class="card"><div class="num">NEWTON'S LAW</div><h3>Inverse-square gravity</h3><p>F = GMm/r². If distance from the Sun doubles, gravitational force becomes one-quarter for the same masses.</p></article><article class="card"><div class="num">CENTRIPETAL FORCE</div><h3>Direction keeps changing</h3><p>Velocity is tangent to the orbit, while centripetal acceleration points towards the Sun: a = v²/r.</p></article><article class="card"><div class="num">KEPLER'S THIRD LAW</div><h3>Farther means slower years</h3><p>T² is proportional to r³ for objects orbiting the same central mass. This is why outer orbits take longer.</p></article></div></section>
+
+<section id="energy"><div class="sectionHead"><div><div class="eyebrow">03 / SUNLIGHT TO EARTH</div><h2>How does the energy get home?</h2></div><p>No cable stretches from the Sun to Earth. A proposed space-solar-power system would convert electricity into a directed beam, then convert it back at a ground receiver.</p></div>
+<div class="flow">
+<div class="flowStep"><b>01 · CAPTURE</b><h4>Sunlight</h4><p>Photovoltaic cells absorb sunlight and produce DC electricity.</p></div><div class="flowStep"><b>02 · CONDITION</b><h4>Power electronics</h4><p>Converters regulate voltage and prepare power for transmission.</p></div><div class="flowStep"><b>03 · TRANSMIT</b><h4>Microwave / laser</h4><p>An antenna or optical system directs energy towards a receiver.</p></div><div class="flowStep"><b>04 · RECEIVE</b><h4>Rectenna</h4><p>For microwaves, an antenna array rectifies the received signal into DC electricity.</p></div><div class="flowStep"><b>05 · DELIVER</b><h4>Grid connection</h4><p>Inverters and transformers condition power for the electrical grid.</p></div>
+</div>
+<div class="split" style="margin-top:13px"><article class="bigPanel"><div class="eyebrow">MICROWAVE POWER BEAM</div><h3>Radio waves carry the energy.</h3><p>A phased-array transmitter could steer a microwave beam to a large rectenna on Earth. Individual antenna elements work together so their waves combine in the desired direction. The rectenna uses receiving elements and rectifier circuits to convert RF energy into electrical power.</p><div class="equation">Sunlight → DC → RF / microwave → DC</div><p>It is not a laser-like hot cutting beam. Beam design, frequency, exposure limits, pointing, and receiver footprint must be carefully engineered and regulated.</p></article><article class="bigPanel"><div class="eyebrow">LASER POWER BEAM</div><h3>Light can also transmit power.</h3><p>A laser transmitter could send concentrated light to a photovoltaic receiver designed for that wavelength. This can enable a narrower beam, but clouds, atmospheric absorption, pointing accuracy, eye safety, and conversion losses are serious challenges.</p><div class="equation">Sunlight → DC → laser light → DC</div><p>Both are proposed approaches. A practical Dyson Swarm might use energy locally in space as well as transmit some power to Earth; sending every collected joule home would not necessarily make sense.</p></article></div></section>
+
+<section id="collector"><div class="sectionHead"><div><div class="eyebrow">04 / COLLECTOR LAB</div><h2>Zoom into one satellite.</h2></div><p>Click a collector in the orbital simulation to open its live inspection panel. This cutaway explains the main systems in one hypothetical collector unit.</p></div>
+<div class="tabs" id="collectorTabs"><button class="tab active" data-part="panel">Photovoltaic array</button><button class="tab" data-part="frame">Support structure</button><button class="tab" data-part="power">Power electronics</button><button class="tab" data-part="thermal">Thermal control</button><button class="tab" data-part="antenna">Transmitter</button></div>
+<div class="bigPanel inspect"><div class="collectorArt"><svg viewBox="0 0 520 310" role="img" aria-label="Illustration of a solar collector satellite"><defs><linearGradient id="solar" x2="1" y2="1"><stop stop-color="#2e7896"/><stop offset="1" stop-color="#142d58"/></linearGradient><linearGradient id="gold" x2="1" y2="1"><stop stop-color="#ffe0a0"/><stop offset="1" stop-color="#a86a31"/></linearGradient></defs><g stroke="#8bc9e1" stroke-width="3" fill="none"><path d="M260 148 L260 175 L185 210 M260 175 L335 210"/><path d="M260 148 L260 86"/></g><g id="arrayLeft"><rect x="25" y="95" width="155" height="104" rx="3" fill="url(#solar)" stroke="#7bd9ee" stroke-width="2"/><path d="M63 95v104M102 95v104M141 95v104M25 129h155M25 164h155" stroke="#76b5d4" stroke-width="1.4"/></g><g id="arrayRight"><rect x="340" y="95" width="155" height="104" rx="3" fill="url(#solar)" stroke="#7bd9ee" stroke-width="2"/><path d="M378 95v104M417 95v104M456 95v104M340 129h155M340 164h155" stroke="#76b5d4" stroke-width="1.4"/></g><rect x="224" y="116" width="72" height="66" rx="8" fill="url(#gold)" stroke="#ffe4ae" stroke-width="2"/><rect x="238" y="129" width="44" height="37" rx="4" fill="#263d53" stroke="#ffdb99"/><path d="M260 116V78M248 78h24" stroke="#ffce83" stroke-width="4"/><path d="M260 182v40" stroke="#c8e7ef" stroke-width="3"/><path d="M235 221h50l-9 19h-32z" fill="#7899aa" stroke="#c2e2ed"/><circle cx="260" cy="148" r="4" fill="#fff"/></svg></div><div><div class="eyebrow" id="partNo">SUBSYSTEM 01</div><h3 id="partTitle" style="margin:7px 0 8px">Photovoltaic array</h3><p class="muted" id="partText">The collector's broad panel surface contains photovoltaic cells. Photons transfer energy to charge carriers in a semiconductor, producing a voltage and current when the cell is connected to a circuit.</p><div class="facts"><div class="fact"><span>ILLUSTRATIVE AREA</span><b id="unitArea">1,000 m²</b></div><div class="fact"><span>ASSUMED EFFICIENCY</span><b>30%</b></div><div class="fact"><span>SUNLIGHT AT UNIT</span><b id="unitFlux">1,361 W/m²</b></div><div class="fact"><span>EST. ELECTRICAL OUTPUT</span><b id="unitOutput">408 kW</b></div></div></div></div>
+<div class="bigPanel" style="margin-top:12px"><div class="eyebrow">SELECTED COLLECTOR TELEMETRY</div><h3 style="margin:7px 0">What is this satellite collecting at its orbit?</h3><p class="muted">Select a satellite in the simulation to update these values. The solar flux uses the inverse-square law relative to Earth's average orbital distance (1 AU), with an illustrative solar constant of 1,361 W/m².</p><div class="facts"><div class="fact"><span>COLLECTOR ID</span><b id="selID">None selected</b></div><div class="fact"><span>ORBITAL DISTANCE</span><b id="selDist">1.00 AU</b></div><div class="fact"><span>INCIDENT SOLAR POWER</span><b id="incident">1.361 MW</b></div><div class="fact"><span>CONVERTED ELECTRICAL POWER</span><b id="electrical">408 kW</b></div></div><p class="notice">Model assumptions: panel area is adjustable; cell efficiency is fixed at 30%; panel is assumed to face the Sun directly; no shadowing, degradation, wiring loss, transmission loss, or radiator penalty is included. Actual collector orientation and hardware would change the result.</p></div>
+</section>
+
+<section id="build"><div class="sectionHead"><div><div class="eyebrow">05 / ENGINEERING REALITY CHECK</div><h2>Could humanity build it?</h2></div><p>The underlying physics is real. The complete megastructure is speculative. Here are some of the hardest steps between today's technology and a star-scale energy network.</p></div>
+<div class="cards"><article class="card"><div class="num">MATERIALS</div><h3>Build in space</h3><p>Mining asteroids or the Moon and manufacturing components in space could reduce launch mass from Earth, but this industrial chain does not yet exist at the required scale.</p></article><article class="card"><div class="num">ORBITAL SAFETY</div><h3>Prevent collisions</h3><p>Each collector follows its own orbit. Tracking, station-keeping, collision avoidance, and debris mitigation would be essential.</p></article><article class="card"><div class="num">HEAT</div><h3>Radiate waste heat</h3><p>Solar cells and electronics are not perfectly efficient. Waste heat must be rejected, often using radiators, because space has no surrounding air to carry heat away by convection.</p></article><article class="card"><div class="num">AUTOMATION</div><h3>Robots maintain robots</h3><p>Autonomous spacecraft and servicing systems would inspect, repair, assemble, and recycle units across enormous distances.</p></article><article class="card"><div class="num">TRANSMISSION</div><h3>Deliver power safely</h3><p>Beams require accurate pointing, suitable receivers, controlled exposure, and reliable conversion at both ends.</p></article><article class="card"><div class="num">GOVERNANCE</div><h3>Share a star's energy</h3><p>Ownership, access, orbital traffic, environmental impact, and international coordination would be major social and political questions.</p></article></div>
+<div class="sectionHead"><div><div class="eyebrow">06 / LONG-TERM ROADMAP</div><h2>From first satellite to star-scale.</h2></div><p>An illustrative pathway, not a prediction or a promised schedule.</p></div><div class="timeline"><article class="time"><b>STAGE 01</b><h3>Demonstrate</h3><p>Improve solar power satellites, robotics, autonomous navigation, and long-duration operations.</p></article><article class="time"><b>STAGE 02</b><h3>Build orbital industry</h3><p>Develop resource prospecting, material processing, manufacturing, and recycling beyond Earth.</p></article><article class="time"><b>STAGE 03</b><h3>Scale the fleet</h3><p>Deploy larger groups of collectors, servicing craft, receivers, and power networks.</p></article><article class="time"><b>STAGE 04</b><h3>Grow a swarm</h3><p>Expand a distributed stellar energy infrastructure only if it proves useful, safe, and sustainable.</p></article></div>
+</section>
+<section><div class="sectionHead"><div><div class="eyebrow">07 / THE BIG PICTURE</div><h2>A Type II civilization?</h2></div></div><div class="split"><article class="bigPanel"><h3>The Kardashev Scale</h3><p>A framework proposed to classify civilizations by the scale of energy they can harness. Type I is often described as planetary-scale, Type II as stellar-scale, and Type III as galactic-scale. A Dyson Swarm is one hypothetical concept for collecting a star's energy.</p></article><article class="bigPanel"><h3>Remember the distinction</h3><p>The Dyson Swarm is a theoretical megastructure, not an existing project. Individual technologies such as photovoltaics, orbital mechanics, antennas, and power electronics are real; combining them into a vast swarm remains far beyond current capability.</p></article></div></section>
+<footer><div><strong>ORBITAL / LAB</strong><br>Class XI Physics · Gravitation · Space energy concepts</div><div>Educational simulation. Not to scale and not a validated orbital simulation. Power calculations are simplified estimates using stated assumptions. Dyson Swarms and large-scale space-to-Earth power transmission remain speculative.</div></footer>
+</main>
+
+<div class="modal" id="earthModal" role="dialog" aria-modal="true" aria-labelledby="earthModalTitle"><div class="modalBox"><div class="modalHead"><h3 id="earthModalTitle">EARTH POWER RECEIVER · RECTENNA</h3><button type="button" class="close" id="closeEarth">✕ CLOSE</button></div><div class="modalBody"><div class="eyebrow">FROM SPACE BEAM TO ELECTRICITY ON THE GROUND</div><h3 style="font-size:24px;margin:6px 0">How Earth collects the transmitted energy</h3><p class="muted">A microwave power beam is directed towards a receiving site. A rectenna combines an antenna array with rectifier circuits that convert the received radio-frequency energy into direct-current electricity.</p><div class="earthDiagram"><svg viewBox="0 0 760 300" role="img" aria-label="Microwave beam arrives from a space transmitter and is collected by a rectenna, converted and sent to the electricity grid"><defs><linearGradient id="beamGrad" x1="0" x2="1"><stop stop-color="#67e4f2" stop-opacity=".05"/><stop offset="1" stop-color="#67e4f2" stop-opacity=".8"/></linearGradient><linearGradient id="groundGrad" x2="0" y2="1"><stop stop-color="#4a9c75"/><stop offset="1" stop-color="#153e37"/></linearGradient></defs><circle cx="92" cy="67" r="28" fill="#d6e6ee" stroke="#fff" stroke-width="2"/><path d="M92 35v-12m0 88v-12M60 67H47m90 0h-13" stroke="#d6e6ee" stroke-width="3"/><text x="92" y="116" fill="#d9eaf6" text-anchor="middle" font-size="13">SPACECRAFT</text><path d="M130 68L510 190L510 218Z" fill="url(#beamGrad)"/><path d="M130 68L510 202" stroke="#71e7f4" stroke-width="2.5" stroke-dasharray="8 6"/><text x="315" y="91" fill="#75e6f2" font-size="13" text-anchor="middle">DIRECTED MICROWAVE BEAM</text><path d="M0 220 Q120 190 250 218 T500 215 T760 218V300H0Z" fill="url(#groundGrad)"/><g transform="translate(500 190)"><path d="M0 28L190 28" stroke="#d4e6ef" stroke-width="5"/><path d="M8 26L30 0L52 26M45 26L67 0L89 26M82 26L104 0L126 26M119 26L141 0L163 26" fill="none" stroke="#79d9ee" stroke-width="3"/><path d="M20 28v18m38-18v18m38-18v18m38-18v18" stroke="#c9e3ed" stroke-width="3"/><text x="95" y="-10" fill="#bfeef5" text-anchor="middle" font-size="13">RECTENNA FIELD</text></g><path d="M610 245v-30h25v30m-12-30v-25m-10 25h20" stroke="#f4cf82" stroke-width="3" fill="none"/><path d="M634 226h35" stroke="#f4cf82" stroke-width="3"/><text x="665" y="211" fill="#f4d28c" font-size="12" text-anchor="middle">GRID</text><text x="380" y="280" fill="#d7e8ed" font-size="12" text-anchor="middle">GROUND RECEIVER SITE</text></svg></div><div class="earthSteps"><div><b>01 · RECEIVE</b>Antenna elements intercept the microwave energy.</div><div><b>02 · RECTIFY</b>Diodes and circuits convert RF into DC electricity.</div><div><b>03 · CONDITION</b>Power electronics regulate voltage and synchronize output.</div><div><b>04 · DISTRIBUTE</b>Transformers and grid equipment deliver electricity to users.</div></div><p class="notice">This is a conceptual microwave rectenna system. A laser-based system would use a wavelength-matched photovoltaic receiver instead. Atmospheric effects, beam safety, conversion losses, land use and precise pointing all matter. This is a proposed technology pathway, not an operational Dyson Swarm system.</p></div></div></div>
+<div class="modal" id="planetModal" role="dialog" aria-modal="true" aria-labelledby="planetInfoTitle"><div class="modalBox"><div class="modalHead"><h3 id="planetInfoTitle">PLANET ORBITAL PROFILE</h3><button type="button" class="close" id="closePlanet">✕ CLOSE</button></div><div class="modalBody" id="planetInfoBody"></div></div></div>
+<div class="modal" id="collectorModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modalBox"><div class="modalHead"><h3 id="modalTitle">COLLECTOR UNIT INSPECTION</h3><button type="button" class="close" id="closeModal">✕ CLOSE</button></div><div class="modalBody"><div class="collectorGrid"><div><div class="collectorGraphic"><svg viewBox="0 0 620 360" role="img" aria-label="Engineering illustration of a solar power satellite with photovoltaic wings, central bus, radiator, and microwave phased array"><defs><linearGradient id="wingCell" x2="0" y2="1"><stop stop-color="#397f9d"/><stop offset="1" stop-color="#102b50"/></linearGradient><linearGradient id="busMetal" x2="1" y2="1"><stop stop-color="#f4d39a"/><stop offset="1" stop-color="#8a633d"/></linearGradient></defs><g stroke="#d0e6ef" stroke-width="3" fill="none"><path d="M310 165L310 208M310 180L180 180M310 180L440 180"/><path d="M310 130V85" stroke="#f0c879"/><path d="M310 215L280 275M310 215L340 275"/></g><g transform="translate(28 110)"><rect width="190" height="105" rx="3" fill="url(#wingCell)" stroke="#8ddcf0" stroke-width="2"/><g stroke="#73bad9" stroke-width="1.4"><path d="M31 0v105M63 0v105M95 0v105M127 0v105M159 0v105M0 35h190M0 70h190"/></g><path d="M8 8h174v89H8z" fill="none" stroke="#c1e8f4" opacity=".35"/></g><g transform="translate(402 110)"><rect width="190" height="105" rx="3" fill="url(#wingCell)" stroke="#8ddcf0" stroke-width="2"/><g stroke="#73bad9" stroke-width="1.4"><path d="M31 0v105M63 0v105M95 0v105M127 0v105M159 0v105M0 35h190M0 70h190"/></g><path d="M8 8h174v89H8z" fill="none" stroke="#c1e8f4" opacity=".35"/></g><rect x="273" y="130" width="74" height="82" rx="7" fill="url(#busMetal)" stroke="#ffe4ad" stroke-width="2"/><rect x="284" y="143" width="52" height="31" rx="3" fill="#18344b" stroke="#f9d89f"/><circle cx="310" cy="158" r="7" fill="#71ddec"/><path d="M285 188h50" stroke="#5b4634" stroke-width="3"/><path d="M310 130V78" stroke="#f5d18a" stroke-width="4"/><path d="M291 78h38l-7-15h-24z" fill="#c9dce5" stroke="#fff"/><path d="M278 213h64l-9 30h-46z" fill="#91aab8" stroke="#e0f0f4"/><path d="M287 220h46" stroke="#4c6471" stroke-width="3"/><g transform="translate(268 274)"><path d="M0 0h84l-10 28H10z" fill="#b5cbd4" stroke="#edf9fc" stroke-width="2"/><path d="M12 7h60M18 15h48" stroke="#69899a" stroke-width="2"/></g><g fill="#c8e4ee" font-size="12"><text x="120" y="91" text-anchor="middle">PV WING A</text><text x="500" y="91" text-anchor="middle">PV WING B</text><text x="310" y="34" text-anchor="middle">BOOM + POINTING SENSOR</text><text x="310" y="328" text-anchor="middle">PHASED-ARRAY TRANSMITTER</text></g><path d="M260 280L310 302L360 280" fill="none" stroke="#71ddec" stroke-width="1.5" stroke-dasharray="4 4"/></svg></div><div class="notice">Simplified conceptual cutaway. A real spacecraft layout would depend on its orbit, mission, thermal design, and transmission architecture.</div></div><div><div class="eyebrow">SELECTED OBJECT</div><h3 id="modalUnit" style="font-size:25px;margin:6px 0">Collector 001</h3><p class="muted">This is one independent spacecraft in the swarm, not a segment of a solid shell.</p><div class="modalStats"><div><span>ORBIT RADIUS</span><b id="modalRadius">1.00 AU</b></div><div><span>ORBITAL SPEED</span><b id="modalSpeed">29.78 km/s</b></div><div><span>ORBITAL PERIOD</span><b id="modalPeriod">365.3 days</b></div><div><span>INCIDENT SUNLIGHT</span><b id="modalFlux">1,361 W/m²</b></div><div><span>SOLAR POWER ON PANEL</span><b id="modalIncident">1.361 MW</b></div><div><span>ELECTRICAL OUTPUT</span><b id="modalOutput">408 kW</b></div></div><div class="layerList"><div class="layer"><i class="swatch" style="background:#4aa4c3"></i><span><b>Photovoltaic cells</b> — semiconductor layers convert photons into electrical current.</span></div><div class="layer"><i class="swatch" style="background:#d5a35e"></i><span><b>Support frame</b> — lightweight truss holds the panel and maintains its geometry.</span></div><div class="layer"><i class="swatch" style="background:#38566d"></i><span><b>Power electronics</b> — regulators, converters, protection and distribution.</span></div><div class="layer"><i class="swatch" style="background:#d9e8e8"></i><span><b>Radiators</b> — reject waste heat from cells and electronics.</span></div><div class="layer"><i class="swatch" style="background:#ffcb75"></i><span><b>Transmitter / antenna</b> — sends energy as a directed microwave or laser beam in proposed designs.</span></div></div></div></div></div></div></div>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const canvas=$('space'),ctx=canvas.getContext&&canvas.getContext('2d'),stage=$('stage');
+if(!ctx){stage.innerHTML='<div style="padding:35px;color:#fff;font:16px/1.6 Arial">Canvas is unavailable in this browser. Please open this file in a current version of Chrome or Edge.</div>';return;}
+
+const AU=149597870700,G=6.67430e-11,MSUN=1.98847e30,SOLAR_FLUX=1361,ETA=.30,TAU=Math.PI*2;
+let W=0,H=0,dpr=1,camYaw=-.42,camPitch=.42,zoom=1,seed=42,selected=-1;
+let count=180,distAU=1.35,area=1000,speedFactor=1,showOrbits=true,showBeams=true,showLabels=false,simDays=0,lastFrame=0;
+let collectorCache=[],planetOrbitCache=[],collectorOrbitCache=[];
+let framePositions=[],beamCache={clear:0,blocked:0,lines:[]},lastBeamUpdate=0,lastDrawTime=0;
+const TARGET_FRAME_MS=1000/30;
+
+const planets=[
+ {name:'MERCURY',au:.387,e:.2056,i:7.005,node:48.3,peri:29.1,color:'#aeb5bf',size:2.7,period:87.969,phase:2.4,radiusAU:1.63e-5},
+ {name:'VENUS',au:.723,e:.0068,i:3.394,node:76.7,peri:54.9,color:'#e6bd82',size:4.0,period:224.701,phase:4.4,radiusAU:4.04e-5},
+ {name:'EARTH',au:1,e:.0167,i:0,node:0,peri:102.9,color:'#58b9ef',size:5.4,period:365.256,phase:5.5,earth:true,radiusAU:4.26e-5},
+ {name:'MARS',au:1.524,e:.0934,i:1.850,node:49.6,peri:286.5,color:'#d8795f',size:3.8,period:686.98,phase:1.1,radiusAU:2.27e-5},
+ {name:'JUPITER',au:5.203,e:.0489,i:1.303,node:100.5,peri:273.9,color:'#d7b18d',size:8.5,period:4332.59,phase:3.2,radiusAU:4.78e-4},
+ {name:'SATURN',au:9.537,e:.0565,i:2.485,node:113.7,peri:339.4,color:'#d9c18c',size:7.3,period:10759.2,phase:5.0,radiusAU:4.02e-4,ring:true},
+ {name:'URANUS',au:19.19,e:.0472,i:.773,node:74.0,peri:96.9,color:'#8bd9d8',size:6.0,period:30688.5,phase:2.0,radiusAU:1.70e-4},
+ {name:'NEPTUNE',au:30.07,e:.0086,i:1.770,node:131.8,peri:273.2,color:'#668de7',size:6.0,period:60182,phase:4.0,radiusAU:1.65e-4}
+];
+const rad=d=>d*Math.PI/180;
+
+function resize(){
+ const r=stage.getBoundingClientRect();
+ W=Math.max(1,r.width||stage.clientWidth||640);H=Math.max(1,r.height||stage.clientHeight||480);
+ dpr=Math.min(window.devicePixelRatio||1,1.25);
+ canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+if(typeof ResizeObserver!=='undefined'){try{new ResizeObserver(resize).observe(stage)}catch(e){window.addEventListener('resize',resize)}}else window.addEventListener('resize',resize);
+window.addEventListener('resize',resize);resize();
+
+function rand(i){const x=Math.sin((i+1)*127.1+seed*311.7)*43758.5453;return x-Math.floor(x);}
+function buildCollectors(){
+ collectorCache=[];
+ collectorOrbitCache=[];
+ const planeTilts=[-27,-19,-12,-5,3,10,17,25];
+ for(let i=0;i<count;i++){
+  const group=i%planeTilts.length;
+  const inclination=rad(planeTilts[group]+(rand(i+900)-.5)*3.2);
+  const node=TAU*((i*0.61803398875)%1);
+  const orbit=distAU*(.88+rand(i+500)*.24);
+  const phase=TAU*((i*0.61803398875+rand(i)*.07)%1);
+  const c={i,orbit,e:.008+rand(i+1400)*.018,inclination,node,peri:TAU*rand(i+1900),phase};
+  collectorCache.push(c);
+ }
+ // Only a representative subset of collector tracks is drawn; pre-sample their
+ // geometry once instead of solving Kepler's equation for every point every frame.
+ const stride=Math.max(1,Math.floor(count/12));
+ for(let i=0;i<collectorCache.length;i+=stride){
+  const c=collectorCache[i],points=[];
+  for(let j=0;j<120;j++)points.push(orbitalPosition(c.orbit,c.e,c.inclination,c.node,c.peri,TAU*j/120));
+  collectorOrbitCache.push(points);
+ }
+}
+buildCollectors();
+
+function solveEccentricAnomaly(M,e){
+ let E=M;
+ for(let k=0;k<7;k++)E-=(E-e*Math.sin(E)-M)/(1-e*Math.cos(E));
+ return E;
+}
+function orbitalPosition(a,e,inc,node,peri,M){
+ const E=solveEccentricAnomaly(M,e),x=a*(Math.cos(E)-e),y=a*Math.sqrt(1-e*e)*Math.sin(E);
+ const cw=Math.cos(peri),sw=Math.sin(peri),ci=Math.cos(inc),si=Math.sin(inc),co=Math.cos(node),so=Math.sin(node);
+ const xp=x*cw-y*sw,yp=x*sw+y*cw;
+ return {x:xp*co-yp*ci*so,y:yp*si,z:xp*so+yp*ci*co};
+}
+planetOrbitCache=planets.map(p=>{
+ const pts=[];
+ for(let j=0;j<120;j++)pts.push(orbitalPosition(p.au,p.e,rad(p.i),rad(p.node),rad(p.peri),TAU*j/120));
+ return pts;
+});
+function planetPosition(p){
+ const M=p.phase+TAU*(simDays/p.period);
+ return orbitalPosition(p.au,p.e,rad(p.i),rad(p.node),rad(p.peri),M);
+}
+function collectorPosition(c){
+ const period=365.256*Math.pow(c.orbit,1.5);
+ const M=c.phase+TAU*(simDays/period);
+ return orbitalPosition(c.orbit,c.e,c.inclination,c.node,c.peri,M);
+}
+function orbitData(r){
+ const metres=r*AU,v=Math.sqrt(G*MSUN/metres),T=TAU*Math.sqrt(metres**3/(G*MSUN));
+ const g=G*MSUN/(metres*metres),flux=SOLAR_FLUX/(r*r),incident=flux*area,power=incident*ETA;
+ return {v,T,g,flux,incident,power};
+}
+function fmtPower(w){if(w>=1e9)return(w/1e9).toFixed(2)+' GW';if(w>=1e6)return(w/1e6).toFixed(2)+' MW';if(w>=1e3)return(w/1e3).toFixed(1)+' kW';return w.toFixed(0)+' W';}
+function fmtTime(s){const d=s/86400;return d>=365?(d/365.25).toFixed(2)+' years':d.toFixed(1)+' days';}
+function fmtAU(r){return r.toFixed(3)+' AU';}
+function displayRadius(r){return .35+Math.log1p(r)*.53;}
+
+function rotate3D(p){
+ const cy=Math.cos(camYaw),sy=Math.sin(camYaw),cp=Math.cos(camPitch),sp=Math.sin(camPitch);
+ const x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy;
+ return {x,y:p.y*cp-z*sp,z:p.y*sp+z*cp};
+}
+function project(p){
+ const r=Math.hypot(p.x,p.y,p.z)||1e-9,f=displayRadius(r)/r,q=rotate3D({x:p.x*f,y:p.y*f,z:p.z*f});
+ const scale=Math.min(W,H)*.205*zoom,perspective=1/(1+q.z*.035);
+ return {x:W/2+q.x*scale*perspective,y:H/2+q.y*scale*perspective,depth:q.z,scale};
+}
+function drawOrbitPoints(points,color,alpha=.19){
+ ctx.beginPath();
+ for(let j=0;j<points.length;j++){
+  const q=project(points[j]);
+  if(j===0)ctx.moveTo(q.x,q.y);else ctx.lineTo(q.x,q.y);
+ }
+ ctx.closePath();ctx.strokeStyle=color;ctx.globalAlpha=alpha;ctx.lineWidth=1;ctx.stroke();ctx.globalAlpha=1;
+}
+let starCanvas=null,starCtx=null,starW=0,starH=0;
+function drawStarfield(){
+ if(!starCanvas||starW!==W||starH!==H){
+  starCanvas=document.createElement('canvas');starCanvas.width=Math.max(1,Math.ceil(W));starCanvas.height=Math.max(1,Math.ceil(H));
+  starCtx=starCanvas.getContext('2d');starW=W;starH=H;
+  for(let i=0;i<110;i++){
+   const x=((i*97.31)%1)*W,y=((i*213.77)%1)*H,a=.12+((i*17)%9)/22;
+   starCtx.fillStyle=`rgba(185,218,245,${a})`;starCtx.fillRect(x,y,(i%13===0)?1.5:1,(i%13===0)?1.5:1);
+  }
+ }
+ ctx.drawImage(starCanvas,0,0);
+}
+function drawSun(){
+ const x=W/2,y=H/2,r=Math.max(8,Math.min(14,Math.min(W,H)*.018))*zoom;
+ const glow=ctx.createRadialGradient(x,y,1,x,y,r*5.2);
+ glow.addColorStop(0,'rgba(255,250,224,1)');glow.addColorStop(.13,'rgba(255,196,91,.96)');glow.addColorStop(.36,'rgba(255,125,45,.27)');glow.addColorStop(1,'rgba(255,100,35,0)');
+ ctx.fillStyle=glow;ctx.beginPath();ctx.arc(x,y,r*5.2,0,TAU);ctx.fill();
+ const core=ctx.createRadialGradient(x-r*.35,y-r*.4,1,x,y,r);
+ core.addColorStop(0,'#fffde5');core.addColorStop(.43,'#ffda82');core.addColorStop(1,'#f28b36');
+ ctx.fillStyle=core;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();
+ ctx.fillStyle='rgba(255,232,190,.8)';ctx.font='9px system-ui';ctx.textAlign='center';ctx.fillText('THE SUN',x,y+r+14);
+}
+function segmentBlocker(a,b){
+ const vx=b.x-a.x,vy=b.y-a.y,vz=b.z-a.z,den=vx*vx+vy*vy+vz*vz;
+ const sunT=-(a.x*vx+a.y*vy+a.z*vz)/den;
+ if(sunT>0&&sunT<1){const sx=a.x+sunT*vx,sy=a.y+sunT*vy,sz=a.z+sunT*vz;if(sx*sx+sy*sy+sz*sz<.00465*.00465)return {name:'SUN'};}
+ for(const p of planets){
+  if(p.earth)continue;
+  const c=planetPosition(p),wx=c.x-a.x,wy=c.y-a.y,wz=c.z-a.z;
+  const t=Math.max(0,Math.min(1,(vx*wx+vy*wy+vz*wz)/den));
+  if(t<=.015||t>=.985)continue;
+  const dx=a.x+t*vx-c.x,dy=a.y+t*vy-c.y,dz=a.z+t*vz-c.z;
+  // Inflated model radii make the obstruction legible at this compressed display scale.
+  const rr=Math.max(.0022,p.radiusAU*8);
+  if(dx*dx+dy*dy+dz*dz<rr*rr)return p;
+ }
+ return null;
+}
+function refreshBeams(t){
+ const earth=planetPosition(planets.find(p=>p.earth)),lines=[];
+ const stride=Math.max(1,Math.floor(count/20));
+ let clear=0,blocked=0;
+ for(let i=0;i<count;i+=stride){
+  const pos=framePositions[i]||collectorPosition(collectorCache[i]),blocker=segmentBlocker(pos,earth);
+  if(blocker)blocked++;else clear++;
+  lines.push({pos,blocker});
+ }
+ beamCache={clear,blocked,lines};lastBeamUpdate=t;
+}
+function drawBeams(t){
+ if(t-lastBeamUpdate>350||!beamCache.lines.length)refreshBeams(t);
+ const ep=project(planetPosition(planets.find(p=>p.earth)));
+ for(const line of beamCache.lines){
+  const q=project(line.pos),ok=!line.blocker;
+  ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(ep.x,ep.y);
+  ctx.setLineDash(ok?[]:[4,5]);ctx.strokeStyle=ok?'rgba(91,224,239,.62)':'rgba(255,104,111,.78)';
+  ctx.lineWidth=ok?1:1.35;ctx.stroke();
+ }
+ ctx.setLineDash([]);
+ ctx.textAlign='right';ctx.font='10px system-ui';ctx.fillStyle='#72e5f0';ctx.fillText('CLEAR: '+beamCache.clear,W-18,58);ctx.fillStyle='#ff8585';ctx.fillText('OBSTRUCTED: '+beamCache.blocked,W-18,73);
+ return beamCache;
+}
+function drawPlanetAt(p,q){
+ const r=p.size*Math.max(.72,Math.min(1.35,zoom));
+ ctx.save();ctx.shadowBlur=p.earth?16:8;ctx.shadowColor=p.color;
+ const g=ctx.createRadialGradient(q.x-r*.35,q.y-r*.4,1,q.x,q.y,r);
+ g.addColorStop(0,'#ffffff');g.addColorStop(.24,p.color);g.addColorStop(1,'#17263a');
+ ctx.fillStyle=g;ctx.beginPath();ctx.arc(q.x,q.y,r,0,TAU);ctx.fill();ctx.shadowBlur=0;
+ if(p.ring){ctx.strokeStyle='rgba(230,211,160,.9)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(q.x,q.y,r*1.8,r*.58,-.25,0,TAU);ctx.stroke();}
+ if(p.earth){ctx.strokeStyle='#b5efff';ctx.lineWidth=1.1;ctx.beginPath();ctx.arc(q.x,q.y,r+3,0,TAU);ctx.stroke();}
+ ctx.restore();
+ ctx.fillStyle='#d3e6f4';ctx.font='9px system-ui';ctx.textAlign='center';ctx.fillText(p.name,q.x,q.y-r-6);
+ if(selectedPlanet===p.name){ctx.strokeStyle='#fff';ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(q.x,q.y,r+6,0,TAU);ctx.stroke();}
+}
+let selectedPlanet='';
+function drawCollectorAt(c,q){
+ const z=Math.max(.65,Math.min(1.7,zoom)),s=2.3*z;
+ const color=c.i===selected?'#fff':'#67dce9';
+ // A tiny spacecraft silhouette: twin photovoltaic wings, bus, radiator and antenna.
+ ctx.save();ctx.translate(q.x,q.y);ctx.rotate(Math.atan2(q.y-H/2,q.x-W/2)+.25);
+ // Avoid per-object canvas shadows: they are costly when dozens of satellites are visible.
+ ctx.fillStyle=c.i===selected?'#fff':'#42aeca';ctx.strokeStyle=c.i===selected?'#fff':'#b7f5ff';ctx.lineWidth=.65;
+ ctx.fillRect(-s*3.4,-s*.55,s*2.15,s*1.1);ctx.fillRect(s*1.25,-s*.55,s*2.15,s*1.1);
+ ctx.fillStyle='#d6e8ee';ctx.fillRect(-s*1.1,-s*.9,s*2.2,s*1.8);
+ ctx.fillStyle='#f4c978';ctx.fillRect(-s*.28,-s*.48,s*.56,s*.96);
+ ctx.strokeStyle='#d6e8ee';ctx.beginPath();ctx.moveTo(0,-s*.95);ctx.lineTo(0,-s*1.55);ctx.stroke();
+ ctx.restore();
+ if(c.i===selected){ctx.beginPath();ctx.arc(q.x,q.y,11*z,0,TAU);ctx.strokeStyle='#fff';ctx.lineWidth=1.2;ctx.stroke();}
+ if(showLabels&&c.i%Math.max(1,Math.floor(count/14))===0){ctx.fillStyle='#c8e8f3';ctx.font='8px system-ui';ctx.fillText('UNIT '+String(c.i+1).padStart(3,'0'),q.x+9,q.y-7);}
+}
+function draw(t=performance.now()){
+ ctx.clearRect(0,0,W,H);drawStarfield();
+ framePositions=collectorCache.map(c=>collectorPosition(c));
+ if(showOrbits){
+  for(let i=0;i<planets.length;i++)drawOrbitPoints(planetOrbitCache[i],planets[i].color,.20);
+  for(const points of collectorOrbitCache)drawOrbitPoints(points,'#4bcce8',.12);
+ }
+ if(showBeams)drawBeams(t);
+ drawSun();
+ const objects=[];
+ for(let i=0;i<collectorCache.length;i++){
+  const q=project(framePositions[i]);objects.push({kind:0,item:collectorCache[i],depth:q.depth,q});
+ }
+ for(const p of planets){const q=project(planetPosition(p));objects.push({kind:1,item:p,depth:q.depth,q});}
+ objects.sort((a,b)=>a.depth-b.depth);
+ for(const o of objects){if(o.kind===0)drawCollectorAt(o.item,o.q);else drawPlanetAt(o.item,o.q);}
+}
+function currentCollectorRadius(c){const p=collectorPosition(c);return Math.hypot(p.x,p.y,p.z);}
+function update(){
+ $('countVal').textContent=count;$('distVal').textContent=distAU.toFixed(2)+' AU';$('areaVal').textContent=area.toLocaleString()+' m²';$('speedVal').textContent=speedFactor.toFixed(1)+'×';
+ $('nSat').textContent=count;$('nDist').textContent=distAU.toFixed(2);$('nArea').textContent=area.toLocaleString();
+ const total=collectorCache.reduce((sum,c)=>sum+orbitData(currentCollectorRadius(c)).power,0);
+ $('swarmPower').innerHTML=fmtPower(total)+' <small>gross electrical output · simplified</small>';
+ const d=orbitData(distAU);$('orbSpeed').textContent=(d.v/1000).toFixed(2)+' km/s';$('orbPeriod').textContent=fmtTime(d.T);$('gravField').textContent=d.g.toExponential(3)+' m/s²';$('orbRadius').textContent=distAU.toFixed(2)+' AU';
+ updateTelemetry();
+}
+function updateTelemetry(){
+ const c=collectorCache[Math.max(0,Math.min(count-1,selected>=0?selected:0))],r=currentCollectorRadius(c),d=orbitData(r);
+ $('unitArea').textContent=area.toLocaleString()+' m²';$('unitFlux').textContent=Math.round(d.flux).toLocaleString()+' W/m²';$('unitOutput').textContent=fmtPower(d.power);
+ $('selID').textContent=selected>=0?'UNIT '+String(selected+1).padStart(3,'0'):'Default example · unit 001';$('selDist').textContent=r.toFixed(2)+' AU';$('incident').textContent=fmtPower(d.incident);$('electrical').textContent=fmtPower(d.power);
+ if(selected>=0){
+  $('modalUnit').textContent='Collector '+String(selected+1).padStart(3,'0');$('modalRadius').textContent=r.toFixed(2)+' AU';
+  $('modalSpeed').textContent=(d.v/1000).toFixed(2)+' km/s';$('modalPeriod').textContent=fmtTime(d.T);
+  $('modalFlux').textContent=Math.round(d.flux).toLocaleString()+' W/m²';$('modalIncident').textContent=fmtPower(d.incident);$('modalOutput').textContent=fmtPower(d.power);
+ }
+}
+function openPlanetInfo(p){
+ if(p.earth){$('earthModal').classList.add('open');return;}
+ selectedPlanet=p.name;
+ const r=p.au,d=orbitData(r),v=d.v/1000,period=p.period.toFixed(1);
+ $('planetInfoTitle').textContent=p.name+' · ORBITAL PROFILE';
+ $('planetInfoBody').innerHTML=`<div class="eyebrow">SOLAR SYSTEM TARGET / CLASS XI GRAVITATION</div><p class="muted">${p.name} follows an elliptical orbit around the Sun. Its orbital motion is governed primarily by solar gravity; its orbital plane is only slightly tilted relative to Earth's ecliptic.</p><div class="modalStats"><div><span>SEMI-MAJOR AXIS</span><b>${p.au.toFixed(3)} AU</b></div><div><span>ECCENTRICITY</span><b>${p.e.toFixed(4)}</b></div><div><span>INCLINATION</span><b>${p.i.toFixed(2)}°</b></div><div><span>ORBITAL PERIOD</span><b>${period} days</b></div><div><span>CIRCULAR SPEED ESTIMATE</span><b>${v.toFixed(2)} km/s</b></div><div><span>SOLAR IRRADIANCE</span><b>${Math.round(d.flux).toLocaleString()} W/m²</b></div></div><div class="equation">v = √(GM☉ / r) &nbsp;&nbsp; T² ∝ a³</div><p class="notice">The circular speed is an estimate at the semi-major axis. A real elliptical orbit changes speed along its path. The display compresses distances and enlarges planets so the system remains visible.</p>`;
+ $('planetModal').classList.add('open');
+}
+function closeModal(id){$(id).classList.remove('open');}
+let lastTelemetry=0;
+function tick(t){
+ const dt=Math.min(80,t-lastFrame||16.7);lastFrame=t;
+ simDays+=dt*.008*speedFactor;
+ if(t-lastDrawTime>=TARGET_FRAME_MS){
+  draw(t);lastDrawTime=t;
+ }
+ if(t-lastTelemetry>700){update();lastTelemetry=t;}
+ requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+$('count').oninput=e=>{count=+e.target.value;if(selected>=count)selected=-1;buildCollectors();beamCache.lines=[];update();};
+$('distance').oninput=e=>{distAU=+e.target.value/100;buildCollectors();beamCache.lines=[];update();};
+$('area').oninput=e=>{area=+e.target.value;update();};
+$('simSpeed').oninput=e=>{speedFactor=+e.target.value/10;update();};
+$('showOrbits').onchange=e=>showOrbits=e.target.checked;
+$('showBeams').onchange=e=>showBeams=e.target.checked;
+$('showLabels').onchange=e=>showLabels=e.target.checked;
+$('newLayout').onclick=()=>{seed=Math.floor(Math.random()*100000);buildCollectors();selected=-1;update();};
+
+let pointers=new Map(),gesture=null,suppressClick=false;
+function down(e){
+ try{if(stage.setPointerCapture)stage.setPointerCapture(e.pointerId)}catch(err){}
+ pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.classList.add('dragging');suppressClick=false;
+ if(pointers.size===1)gesture={type:'rotate',startX:e.clientX,startY:e.clientY,moved:false};
+ else if(pointers.size===2){const a=[...pointers.values()];gesture={type:'pinch',distance:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y),zoom};}
+}
+function move(e){
+ if(!pointers.has(e.pointerId))return;
+ const old=pointers.get(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(!gesture)return;
+ if(pointers.size>=2){const a=[...pointers.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(gesture.type!=='pinch')gesture={type:'pinch',distance:d,zoom};zoom=Math.max(.55,Math.min(2.5,gesture.zoom*d/Math.max(1,gesture.distance)));suppressClick=true;return;}
+ if(gesture.type==='rotate'){const dx=e.clientX-old.x,dy=e.clientY-old.y;if(Math.abs(e.clientX-gesture.startX)+Math.abs(e.clientY-gesture.startY)>5){gesture.moved=true;suppressClick=true;}camYaw+=dx*.008;camPitch=Math.max(-1.42,Math.min(1.42,camPitch+dy*.006));}
+}
+function up(e){
+ pointers.delete(e.pointerId);
+ if(pointers.size===0){
+  stage.classList.remove('dragging');
+  if(gesture&&gesture.type==='rotate'&&!gesture.moved&&!suppressClick){
+   const rect=canvas.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
+   let best=20,hit=null;
+   for(const p of planets){const q=project(planetPosition(p)),d=Math.hypot(q.x-mx,q.y-my);if(d<Math.max(15,p.size+8)&&d<best){best=d;hit={type:'planet',obj:p};}}
+   for(const c of collectorCache){const q=project(collectorPosition(c)),d=Math.hypot(q.x-mx,q.y-my);if(d<best){best=d;hit={type:'collector',obj:c};}}
+   if(hit&&hit.type==='planet'){selectedPlanet=hit.obj.name;openPlanetInfo(hit.obj);}
+   else if(hit&&hit.type==='collector'){selected=hit.obj.i;selectedPlanet='';updateTelemetry();$('collectorModal').classList.add('open');}
+  }
+  gesture=null;
+ }else if(pointers.size===1){const p=[...pointers.values()][0];gesture={type:'rotate',startX:p.x,startY:p.y,moved:true};}
+}
+if(window.PointerEvent){
+ stage.addEventListener('pointerdown',down);stage.addEventListener('pointermove',move);stage.addEventListener('pointerup',up);stage.addEventListener('pointercancel',up);
+}else{
+ let id=0;
+ stage.addEventListener('mousedown',e=>down({pointerId:1,clientX:e.clientX,clientY:e.clientY}));
+ window.addEventListener('mousemove',e=>move({pointerId:1,clientX:e.clientX,clientY:e.clientY}));
+ window.addEventListener('mouseup',e=>up({pointerId:1,clientX:e.clientX,clientY:e.clientY}));
+ stage.addEventListener('touchstart',e=>{e.preventDefault();for(const t of e.changedTouches)down({pointerId:++id,clientX:t.clientX,clientY:t.clientY});},{passive:false});
+ stage.addEventListener('touchmove',e=>{e.preventDefault();let i=0;for(const t of e.changedTouches){const keys=[...pointers.keys()];move({pointerId:keys[i++]||id,clientX:t.clientX,clientY:t.clientY});}},{passive:false});
+ stage.addEventListener('touchend',e=>{for(const t of e.changedTouches){const key=[...pointers.keys()][0];if(key!==undefined)up({pointerId:key,clientX:t.clientX,clientY:t.clientY});}},{passive:false});
+}
+stage.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.55,Math.min(2.5,zoom*Math.exp(-e.deltaY*.001)));},{passive:false});
+
+$('closeModal').onclick=()=>closeModal('collectorModal');
+$('closeEarth').onclick=()=>closeModal('earthModal');
+$('closePlanet').onclick=()=>closeModal('planetModal');
+['collectorModal','earthModal','planetModal'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeModal(id);}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')['collectorModal','earthModal','planetModal'].forEach(closeModal);});
+
+const parts={
+ panel:['SUBSYSTEM 01','Photovoltaic array','Photovoltaic cells absorb photons. Their semiconductor structure separates electric charge, producing a voltage and current when connected to a circuit. Output depends on sunlight intensity, panel area, cell efficiency, temperature, and orientation.'],
+ frame:['SUBSYSTEM 02','Support structure','A lightweight truss or deployable frame supports the panel, holds it flat, and connects it to the spacecraft bus. The design must be stiff enough to point accurately but light enough to launch or manufacture in space.'],
+ power:['SUBSYSTEM 03','Power electronics','Converters, regulators, switches, and protection circuits manage the electricity generated by the array. They prepare power for onboard systems, storage, or a transmitter. Real hardware also creates waste heat.'],
+ thermal:['SUBSYSTEM 04','Thermal control','Solar collectors absorb energy and electronics generate heat. Radiators release waste heat as infrared radiation. Thermal design protects cells, batteries, computers, and transmitter hardware from extreme temperatures.'],
+ antenna:['SUBSYSTEM 05','Power transmitter','In one proposed architecture, a phased-array microwave antenna directs radio-frequency energy towards a rectenna on Earth. Another concept uses a laser and a wavelength-matched photovoltaic receiver. Neither option is a solved Dyson-scale system.']
+};
+document.querySelectorAll('#collectorTabs .tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('#collectorTabs .tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');const p=parts[b.dataset.part];$('partNo').textContent=p[0];$('partTitle').textContent=p[1];$('partText').textContent=p[2];});
+update();
+})();
+</script>
+</body></html>
